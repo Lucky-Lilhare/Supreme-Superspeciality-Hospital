@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+    
+    function incoming() { 
+      return request.resource.data; 
+    }
+    
+    function existing() { 
+      return resource.data; 
+    }
+    
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Validation blueprints
+    function isValidUser(data) {
+      return data.uid is string && data.uid == request.auth.uid &&
+             data.email is string && data.email.size() <= 128 &&
+             data.name is string && data.name.size() <= 128 &&
+             data.createdAt is string;
+    }
+    
+    function isValidBooking(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.patientName is string && data.patientName.size() <= 120 &&
+             data.patientPhone is string && data.patientPhone.size() <= 30 &&
+             data.patientEmail is string && data.patientEmail.size() <= 120 &&
+             data.departmentId is string && data.departmentId.size() <= 50 &&
+             data.doctorId is string && data.doctorId.size() <= 50 &&
+             data.date is string && data.date.size() <= 20 &&
+             data.timeSlot is string && data.timeSlot.size() <= 30 &&
+             data.symptoms is string && data.symptoms.size() <= 1000 &&
+             data.status is string && (data.status == 'Scheduled' || data.status == 'Completed' || data.status == 'Cancelled') &&
+             data.createdAt is string &&
+             data.userId is string && data.userId == request.auth.uid;
+    }
+    
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && incoming().keys().hasAll(['uid', 'email', 'name', 'createdAt']) && incoming().keys().size() == 4;
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && incoming().uid == existing().uid;
+    }
+    
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(bookingId) && isValidBooking(incoming()) && incoming().keys().hasAll(['id', 'patientName', 'patientPhone', 'patientEmail', 'departmentId', 'doctorId', 'date', 'timeSlot', 'symptoms', 'status', 'createdAt', 'userId']) && incoming().keys().size() == 12;
+      allow update: if isSignedIn() && existing().userId == request.auth.uid && isValidBooking(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['status']) && existing().status == 'Scheduled';
+    }
+  }
+}

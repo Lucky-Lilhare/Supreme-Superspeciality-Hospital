@@ -1,0 +1,6 @@
+{
+  "name": "Supreme Superspeciality Hospital",
+  "description": "A modern, premium digital portal for Supreme Superspeciality Hospital features doctor directories, interactive department deep-dives, and a smart, multi-step appointment booking system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

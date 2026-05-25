@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account registration details",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The firebase auth unique user id"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "name": {
+          "type": "string",
+          "description": "User full name"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of registration"
+        }
+      },
+      "required": [
+        "uid",
+        "email",
+        "name",
+        "createdAt"
+      ]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "A scheduled doctor consultation appointment",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique booking reference code"
+        },
+        "patientName": {
+          "type": "string",
+          "description": "Name of the patient"
+        },
+        "patientPhone": {
+          "type": "string",
+          "description": "Contact phone number of the patient"
+        },
+        "patientEmail": {
+          "type": "string",
+          "description": "Email copy of patient"
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "ID of select clinical division"
+        },
+        "doctorId": {
+          "type": "string",
+          "description": "ID of select physician specialist"
+        },
+        "date": {
+          "type": "string",
+          "description": "Selected consultation calendar date"
+        },
+        "timeSlot": {
+          "type": "string",
+          "description": "Selected timing slot"
+        },
+        "symptoms": {
+          "type": "string",
+          "description": "Reported health complaints"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Scheduled",
+            "Completed",
+            "Cancelled"
+          ],
+          "description": "Current status of appointment"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of booking"
+        },
+        "userId": {
+          "type": "string",
+          "description": "The auth unique user ID who created the appointment"
+        }
+      },
+      "required": [
+        "id",
+        "patientName",
+        "patientPhone",
+        "patientEmail",
+        "departmentId",
+        "doctorId",
+        "date",
+        "timeSlot",
+        "symptoms",
+        "status",
+        "createdAt",
+        "userId"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles indexed by their auth UID"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Doctor appointments indexed by booking sequence code or ID"
+    }
+  }
+}
