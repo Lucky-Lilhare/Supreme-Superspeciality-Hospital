@@ -1,0 +1,1 @@
+This repository features a comprehensive, end-to-end hospital website built entirely through AI generation and prompt engineering. It showcases how modern AI tools can rapidly prototype and build production-ready healthcare interfaces.
